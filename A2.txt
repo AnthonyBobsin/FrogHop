@@ -1,0 +1,264 @@
+CPS305 Assignment 2
+
+No extensions will be given.  No late assignments are accepted.
+
+This file may be copied only by a current CPS305 student, and only to
+her/his personal space for use in this course. It may never be placed in
+any public domain, nor in any place accessible by anyone other than the
+single CPS305 student who copied it.
+
+Consult A2addendum.txt for changes to these requirements, as
+modifications/clarifications may be made at any time and are part of
+this assignment.
+
+Assignment is done in groups of 1, 2 or 3 people. 
+There is no marking penalty for working in a group. 
+------------------------------------------------------------------------
+
+Topics:
+------
+  recursion, ATDs
+
+Platform:
+--------
+  The CS moons
+
+Files:
+-------
+  frogHop.c           (you write it)
+  A2cert.txt          (copy it from A1cert.txt. Edit it correctly)
+  A2member.txt        (copy it and edit correctly--will vary by member)
+
+Submit Files:
+------------
+  Designate ONE PERSON in your group to be the submit-person
+  Note carefully what each person submits:
+ 
+  A2member.txt  EVERY group member submits own (including submit person)
+  frogHop.c     ONLY SUBMIT PERSON submits this
+  A2cert.txt    ONLY SUBMIT PERSON submits this
+
+Figures:
+--------
+The figures mentioned below given as .jpg files in this directory,
+and are also available at the given URLs:
+Figure 1 is A2Fig1.jpg   http://www.scs.ryerson.ca/~dwoit/courses/cps305/coursedirPublic305/assign2Figures/A2Fig1.jpg
+Figure 2 is A2Fig2.jpg   http://www.scs.ryerson.ca/~dwoit/courses/cps305/coursedirPublic305/assign2Figures/A2Fig2.jpg
+Figure 3 is A2Fig3.jpg   http://www.scs.ryerson.ca/~dwoit/courses/cps305/coursedirPublic305/assign2Figures/A2Fig3.jpg
+Figure 4 is A2Fig4.jpg   http://www.scs.ryerson.ca/~dwoit/courses/cps305/coursedirPublic305/assign2Figures/A2Fig4.jpg
+
+
+Background:
+-----------
+The surface of a pond is covered in lily-pads.
+A frog hops from pad to pad. The frog, however, can only hop in certain 
+directions. Figure 1 shows exactly which lily pads a frog can hop to 
+from its current lily pad. A frog can hop to any of the 8 pads shown 
+in Figure 1. However, if a frog is too near the edge of the pond, there 
+will be fewer than 8 possible landing pads. For example, Figure 2 shows 
+the 2 possible landing pads for a frog starting on the upper-left-hand 
+corner lily pad.
+
+Suppose a frog starts on some lily pad in the pond, call it the start pad.
+Questions:
+1. Is it possible for a frog to hop around from pad to pad so that
+    -it lands on each pad in the pond exactly once
+    -every pad in the pond is covered (frog has landed on it)
+     (The start pad was covered at the beginning, and the frog cannot
+     re-land on it.)
+    -it does not do the same "kind" of hop twice in a row. Note that
+     there are 8 kinds of hops; each is at the end of an arrow in Figure 1.
+     Figure 4 shows a hop sequence that is NOT allowed, because the same 
+     kind of hop is done twice in a row: x+1,y+2
+2. If so, what is the path followed by the frog? (This path will start
+   with the start pad, and have exactly P pads on it, where P is
+   the total number of pads in the pond. Each pad will appear on
+   the path exactly one time.)
+   For example, Figure 3 shows one such path; it starts at the lily pad
+   labeled with number 1, and ends at lily pad labeled with number 25.
+
+
+Instructions:
+-------------
+You must write a program, frogHop.c that uses a recursive function in 
+order to answer the questions above. Your program must adhere to all 
+the information above and below (guidelines, algorithms, output, etc.)
+
+If no path exists, your program prints: "No path possible"
+If at least one path exists, your program must output one path (any 
+such path is acceptable).
+
+Data and Data Structures:
+------------------------
+The pond is represented by a SQUARE integer matrix, Pond, with each 
+cell of Pond corresponding to one lily pad.  The start pad is given 
+by its matrix coordinates.  The SIZE of the matrix, and the START PAD 
+coordinates, are given as command-line arguments. 
+i.e., to run the program for Figure 1 (frog starting in the middle of 
+a pond of 7x7=49 lily pads):
+   ./frogHop 7 3 3
+(Pond SIZE is 7, and coordinates of middle lily pad are Pond[3][3] ).
+
+The matrix must be dynamically allocated. 
+The matrix is initialized to all zero. As the program runs, the
+cells will contain positive integers as follows:
+
+Pond[x][y]=0 if this pad is not yet in the current path
+Pond[x][y]=i if this was the ith pad the frog landed on in the 
+             current path. Thus, the start pad is assigned 1.
+
+Output:
+------
+If a path is found, print it as a square of numbers. Extra spaces are
+fine, as long as the columns line up and numbers are right-justified. 
+For example, to show the path given in Figure 2, the following output 
+is acceptable. 
+
+ 1 12  3 18 21
+ 4 17 20 13  8
+11  2  7 22 19
+16  5 24  9 14
+25 10 15  6 23
+
+
+Algorithm for Main Program:
+---------------------------
+
+  main ( SIZE, Start_x, Start_y )
+    initialize Pond to zeros
+    call find_path(Pond, Start_x, Start_y, 1, 0)  
+    print "No path possible"
+
+Note that find_path will only return if no path is found.
+If a path is found, find_path prints it and EXITS the whole program.
+Note that Pond[Start_x][Start_y] is the start pad, and 1 is passed
+to find_path because the start pad is the first pad in the path.
+The value 0 is passed as the final argument to indicate that there 
+is no previous kind of hop to consider, since this is the first hop. 
+
+Recursive Algorithm for find_path:
+----------------------------------
+
+  find_path ( Pond, x, y, i , prevKind)
+     Pond[x][y] = i   //the ith pad along the path
+     if i==SIZE*SIZE  //reached the end of the path
+        print_pond(Pond)
+        exit
+     else
+        let nextValidPadSet be the set of next valid pads
+        for nextPad in nextValidPadSet do
+            let [Px][Py] be nextPad's coordinates 
+            find_path ( Pond, Px, Py, i+1, thisKind )
+        Pond[x][y] = 0   //backtrack
+            
+Note regarding nextValidPadSet:
+  This is the set of possible lily pads for the next step
+  in the path (step i+1). 
+  Use an appropriate data structure for nextValidPadSet, keeping
+  in mind you must be able to iterate over it.
+  See below for what constitutes a "valid" pad.
+
+Note regarding valid pads:
+  If the frog is at the ith pad along the path, then 
+  nextValidPadSet should contain all the pads the frog can hop 
+  to next (candidates for the (i+1)st pad along the path.)
+  E.g., if the frog is at the first stage along the path (i=1)
+  at Pond[3][3] as shown in Figure 1, then nextValidPadSet is 
+  ( [1,2], [1,4], [2,1], [2,5], [4,1], [4,5], [5,2], [5,4] )
+  At most, nextValidPadSet will have 8 pads; however, it often 
+  has less than 8. Why? Because some of the potential 8 pads are 
+  not valid as follows:
+  Out of Range: Some of the 8 pads are invalid because they don't
+    exist (the frog is too close to the edge of the pond).
+  Already Visited: Some of the 8 pads are invalid because the frog 
+    has already landed on this pad previously in this path (i.e., 
+    Pond[Px][Py] is not zero).
+  Same Kind: Even if a pad is in range and has not already been
+    landed on, it might be invalid because it is the same kind of 
+    hop as the previous hop.
+
+Note regarding the backtracking:
+  When some call to find_path starts, Pond[x][y] is set to i to 
+  indicate this is potentially the ith pad along the path. However, 
+  it may not actually be possible to finish the path from this point. 
+  How can we tell if the path cannot be finished from this point? 
+  We can tell because all the recursive calls to find_path inside 
+  the for loop RETURN (we know find_path only returns when it was
+  unsuccessful in completing the path.)
+  So when the path cannot be finished from this point, find_path
+  must undo Pond[x][y]=i because [x][y] cannot be the ith pad
+  along the solution path. We reset this lily pad to 0 so that it 
+  may be re-used further along the path (set by some other find_path 
+  call).
+
+Robustness and Assumptions:
+--------------------------
+  Assume the Pond can never be larger than 9x9 lily pads.
+  Assume storage is always available (e.g., IF you use malloc,
+  assume it never returns NULL).
+  DO NOT make any assumptions about the user's command-line arguments.
+  You must check that these are appropriate (right number, within 
+  acceptable limits, etc.)
+
+Grading:
+--------
+ On a CS moon only, we will compile and run your frogHop.c with
+ arguments of our choice
+
+ -The assignment mark IS ZERO for:
+   -incorrectly named files (includes case!!)
+   -A2cert.txt missing or incorrectly filled-in
+   -A2member.txt missing or incorrectly filled-in for any group member
+   -code does not compile
+   -code compiles, but is not a good attempt at solving the problem
+    (too simplistic, etc.)
+
+ If not zero, then the mark includes, but is not limited to, the
+ following. Note that if the submission is incomplete, then the
+ Style/Documentation mark is also reduced accordingly.
+ 
+
+ -Style and Documentation (20%)
+    -simple, clear, readable code
+    -function header comment
+    -internal documentation only of complicated parts
+    -indentation, formatting, use of whitespace (indent with either tabs
+     or spaces, but not both mixed). Your code should look properly
+     formatted when displayed with moon "cat" command.
+    -meaningful, consistent function and variable names
+    -modularity
+       Good use of helper functions.  If a task is repeated, use a helper
+       function, NOT (nearly) duplicate code.  If a function is too long,
+       consider dividing it into sub-functions, even if they are called
+       only once. Too long is about 30LOC
+
+ -Functionality (60%)
+    -correctness (when following assignment instructions)
+     Your function may produce required results, but will be worth nothing
+     unless it does so by following assignment instructions/requirements.
+    -correctness is measured ONLY by the grader's own tests.
+
+ -Data Structures and Maintainability (20%)
+    -Appropriate data structures and operations for nextValidPadSet
+    -Implementing so that problem constraints can be easily modified
+        e.g., SIZE handled appropriately
+              The 8 possible moves coded so they could be altered 
+              later (in case the frog changes its hopping pattern)
+
+                       
+
+FYI for your own Testing:
+-------------------------
+  For a pond with only  1=1x1 lily pads, there is one (obvious) path.
+  For a pond with only  4=2x2 lily pads, there is NO path.
+  For a pond with only  9=3x3 lily pads, there is NO path.
+  For a pond with only 16=4x4 lily pads, there is NO path.
+  For a pond with only 25=5x5 lily pads, there are paths. One starts at lily pad [0][0]
+  For a pond with only 36=6x6 lily pads, there are paths. One starts at lily pad [0][0]
+  For a pond with only 49=7x7 lily pads, there are paths. One starts at lily pad [1][1]
+  For a pond with only 64=8x8 lily pads, there are paths. One starts at lily pad [0][1]
+  We won't execute program for larger ponds because moons can run out of resources.
+
+  If you start at a position for which no path exists, expect your program to take
+  a long time to complete. 
+
